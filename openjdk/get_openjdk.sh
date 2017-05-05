@@ -1,5 +1,4 @@
 #!/bin/bash
-set -x
 
 if [ $# -ne 2 ]; then
     echo "usage: `basename $0` <git-repo> <tag-or-branch>"
@@ -8,7 +7,9 @@ fi
 
 REPO=$1
 TAG=$2
-WORK_DIR=$PWD/get-openjdk
+WORK_DIR=$PWD/get_openjdk
+IMAGE_DIR=$WORK_DIR/build/*/images/j2sdk-image
+PACKAGE_NAME=openjdk-image
 
 git clone $REPO -b $TAG $WORK_DIR
 if [ $? -ne 0 ]; then
@@ -25,5 +26,11 @@ make all
 if [ $? -ne 0 ]; then
     exit 1;
 fi
+
+cp -r $IMAGE_DIR $PACKAGE_NAME
+tar zcf ${PACKAGE_NAME}.tar.gz $PACKAGE_NAME
+rm -Rf $PACKAGE_NAME
+
+echo "Package: $PWD/${PACKAGE_NAME}.tar.gz"
 
 exit 0
